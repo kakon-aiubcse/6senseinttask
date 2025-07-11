@@ -1,0 +1,29 @@
+{
+  "name": "6senseinttask",
+  "version": "1.0.0",
+  "type": "module",   
+  "description": "A backend API built with Node.js, Express.js, and MongoDB for managing product data as part of a 6sense Technologies internship task.",
+  "main": "index.js",
+ "scripts": {
+  "dev": "nodemon server.js",
+  "start": "node server.js",
+  "test": "echo \"Error: no test specified\" && exit 1"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kakon-aiubcse/6senseinttask.git"
+  },
+  "keywords": ["nodejs", "express", "mongodb", "backend", "api", "internship"],
+  "author": "Khairul Islam Kakon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kakon-aiubcse/6senseinttask/issues"
+  },
+  "homepage": "https://github.com/kakon-aiubcse/6senseinttask#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
