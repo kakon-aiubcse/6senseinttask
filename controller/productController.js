@@ -64,3 +64,14 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
+//getting all product details including category data
+export const allProducts = async(req, res)=>{
+ try{
+   const allproducts = await Product.find().populate("category");
+   res.status(200).json({allproducts});
+ }catch(err){
+  console.log(err)
+
+ }
+}
+
