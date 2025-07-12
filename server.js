@@ -1,36 +1,41 @@
-// server.js
-import express, { json } from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import categoryRoute from "./routes/categoryRoute.js";
-import productRoute from "./routes/productRoute.js";
-import cors from "cors";
+import cors from 'cors';
 
-//dotenv config
-dotenv.config({override:true, silent:true});
+import categoryRoute from './routes/categoryRoute.js';
+import productRoute from './routes/productRoute.js';
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Create Express app
 const app = express();
 
-
-
 // Middleware
-app.use(json());
-app.use(cors());
-app.use(express.json());
+app.use(express.json());  // Body parser for JSON
+app.use(cors());          // Enable CORS
 
-// Basic route
-// app.get('/', (req, res) => {
-//   res.send('Working API...');
-// });
+// Routes
 app.use('/api/categories', categoryRoute);
 app.use('/api/products', productRoute);
 
+// MongoDB connection with options and logging
+const mongoUri = process.env.MONGO_URI;
 
-//connecting mongo db 
-mongoose.connect(process.env.MONGO_URI, ).then(()=>{console.log("mongodb connected locally")}).catch((err)=>{console.log("found error", err)})
-
+mongoose.connect(mongoUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected successfully'))
+.catch((err) => {
+  console.error('MongoDB connection error:', err);
+  process.exit(1); // Exit process if DB connection fails
+});
 
 // Start server
-const PORT = 2001;
+const PORT = process.env.PORT || 2001;
+
 app.listen(PORT, () => {
-  console.log(`Server onboard successfully `);
+  console.log(`Server running on port ${PORT}`);
 });
