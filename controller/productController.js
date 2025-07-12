@@ -1,5 +1,6 @@
 import Product from "../models/productModel.js";
 import Category from "../models/categoryModel.js";
+import generateProductCode from "../utils/generateProductcode.js";
 
 const createProduct = async (req, res) => {
   try {
@@ -12,8 +13,13 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ error: "Invalid category ID" });
     }
 
-    // Placeholder for now — productCode will be improved later
-    const productCode = "placeholder-code";
+    const productCode = generateProductCode(name);
+
+    // Ensure uniqueness
+    const exists = await Product.findOne({ productCode });
+    if (exists) {
+      return res.status(400).json({ error: 'Product code already exists' });
+    }
 
     const newProduct = new Product({
       name,
