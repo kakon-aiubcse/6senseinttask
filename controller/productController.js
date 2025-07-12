@@ -18,7 +18,7 @@ export const createProduct = async (req, res) => {
     // Ensure uniqueness
     const exists = await Product.findOne({ productCode });
     if (exists) {
-      return res.status(400).json({ error: 'Product code already exists' });
+      return res.status(400).json({ error: "Product code already exists" });
     }
 
     const newProduct = new Product({
@@ -44,13 +44,13 @@ export const updateProduct = async (req, res) => {
     const { id } = req.params;
     const { status, description, discount } = req.body;
 
-    if (status && !['Stock Out', 'In Stock'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status value' });
+    if (status && !["Stock Out", "In Stock"].includes(status)) {
+      return res.status(400).json({ error: "Invalid status value" });
     }
 
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: "Product not found" });
     }
 
     if (status !== undefined) product.status = status;
@@ -59,19 +59,39 @@ export const updateProduct = async (req, res) => {
 
     await product.save();
 
-    res.json({ message: 'Product updated', product });
+    res.json({ message: "Product updated", product });
   } catch (err) {
-    res.status(500).json({ error: 'Server error', details: err.message });
+    res.status(500).json({ error: "Server error", details: err.message });
   }
 };
 //getting all product details including category data
-export const allProducts = async(req, res)=>{
- try{
-   const allproducts = await Product.find().populate("category");
-   res.status(200).json({allproducts});
- }catch(err){
-  console.log(err)
+export const allProducts = async (req, res) => {
+  try {
+    const allproducts = await Product.find().populate("category");
+    res.status(200).json({ allproducts });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
- }
-}
+//getting product by name
+export const searchedProduct = async (req, res) => {
+  try {
+    const { productName } = req.query;
+
+    if (!productName) {
+      return res.status(400).json({ error: "Product name is required" });
+    }
+
+    const regex = new RegExp(productName, "i"); 
+    const products = await Product.find({
+      name: { $regex: regex },
+    }).populate("category");
+
+    return res.status(200).json({ products });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+};
 
