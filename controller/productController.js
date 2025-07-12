@@ -114,3 +114,69 @@ export const searchedProduct = async (req, res) => {
   }
 };
 
+//getting products with provided three filters 
+export const getproductwithFilters = async (req, res) => {
+  try {
+    const { categorykeyword, productName } = req.query;
+
+    let categoryId;
+
+    if (categorykeyword) {
+      let searchresult;
+
+      if (
+        categorykeyword.length === 24 &&
+        /^[a-f\d]{24}$/i.test(categorykeyword)
+      ) {
+        searchresult = await Category.findById(categorykeyword);
+      } else {
+        searchresult = await Category.findOne({ name: categorykeyword });
+      }
+
+      if (!searchresult) {
+        return res.status(404).json({ error: "Category not found" });
+      }
+
+      categoryId = searchresult._id;
+    }
+
+    // Build the product query
+    const query = {};
+
+    if (categoryId) {
+      query.category = categoryId;
+    }
+
+    if (productName) {
+      const regex = new RegExp(productName, "i");
+      query.name = { $regex: regex };
+    }
+
+    // Fetch products with filters and populate category info
+    const products = await Product.find(query).populate("category");
+
+    // Pricing calculation - add finalPrice field
+    const result = products.map((product) => {
+      const finalPrice = product.price - (product.price * product.discount) / 100;
+      return {
+        _id: product._id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        discount: product.discount,
+        finalPrice,
+        image: product.image,
+        status: product.status,
+        productCode: product.productCode,
+        category: product.category,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+      };
+    });
+
+    return res.status(200).json({ products: result });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Server error", details: err.message });
+  }
+};
