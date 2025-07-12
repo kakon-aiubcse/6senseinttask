@@ -68,6 +68,7 @@ export const updateProduct = async (req, res) => {
 export const allProducts = async (req, res) => {
   try {
     const allproducts = await Product.find().populate("category");
+    
     res.status(200).json({ allproducts });
   } catch (err) {
     console.log(err);
@@ -87,8 +88,26 @@ export const searchedProduct = async (req, res) => {
     const products = await Product.find({
       name: { $regex: regex },
     }).populate("category");
+    //pricing calculation
+    const result = products.map((product)=>{
+      const finalPrice = product.price - (product.price * product.discount) / 100;
+      return {
+        _id: product._id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        discount: product.discount,
+        finalPrice,
+        image: product.image,
+        status: product.status,
+        productCode: product.productCode,
+        category: product.category,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+      };
+    })
 
-    return res.status(200).json({ products });
+    return res.status(200).json({ products :result });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Server error", details: error.message });
